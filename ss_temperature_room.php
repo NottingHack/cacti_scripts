@@ -21,7 +21,7 @@ if (!isset($called_by_script_server)) {
 
 function ss_temperature($room) {
     $idb = db_link();
-    $query = "SELECT name, reading FROM temperature WHERE name IS NOT NULL";
+    $query = "SELECT name, temperature FROM temperature WHERE name IS NOT NULL ";
 
     $result = $idb->query($query);
     $output = "";
