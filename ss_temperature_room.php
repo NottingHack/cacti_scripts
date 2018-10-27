@@ -28,7 +28,7 @@ function ss_temperature($room) {
 
     while ($row = $result->fetch_object()) {
         if ($row->name == $room) {
-            return 'Temperature:'.$row->reading;
+            return 'Temperature:'.$row->temperature;
         }
     }
 
