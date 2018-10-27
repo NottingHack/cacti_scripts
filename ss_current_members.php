@@ -19,13 +19,13 @@ if (!isset($called_by_script_server)) {
 
 function ss_current_members() {
     $idb = db_link();
-    $query = "SELECT count(member_id) FROM members WHERE member_status = 5";
+    $query = "SELECT count(member_id) AS currentmembers FROM members WHERE member_status = 5";
 
     $result = $idb->query($query);
     $output = "";
 
     while ($row = $result->fetch_object())
-        $output .= 'CurrentMembers:'.$row->count;
+        $output .= 'CurrentMembers:'.$row->currentmembers;
 
     return $output;
 }
