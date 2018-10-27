@@ -9,7 +9,7 @@ if (!isset($_SERVER["argv"][0]) || isset($_SERVER['REQUEST_METHOD'])  || isset($
 $no_http_headers = true;
 
 /* display ALL errors */
-//error_reporting(0);
+error_reporting(0);
 
 if (!isset($called_by_script_server)) {
     include_once(dirname(__FILE__) . "/../include/global.php");
@@ -118,3 +118,5 @@ function ss_unifi_get_sta($host, $user, $pass, $info, $site)
 
     return $results;
 }
+
+?>
