@@ -17,7 +17,7 @@ if (!isset($called_by_script_server)) {
     print call_user_func("ss_current_members");
 }
 
-function ss_light_level() {
+function ss_current_members() {
     $idb = db_link();
     $query = "SELECT count(member_id) FROM members WHERE member_status = 5";
 
