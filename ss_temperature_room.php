@@ -32,7 +32,7 @@ function ss_temperature($room) {
         }
     }
 
-    return 'U';
+    return "";
 }
 
 ?>

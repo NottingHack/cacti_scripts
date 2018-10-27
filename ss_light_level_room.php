@@ -32,7 +32,7 @@ function ss_light_level($room) {
         }
     }
 
-    return 'U';
+    return "";
 }
 
 ?>
