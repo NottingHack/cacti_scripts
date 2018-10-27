@@ -16,7 +16,7 @@
 		
 		array_shift($_SERVER['argv']);
 
-		print call_user_func("ss_light_level", $_SERVER['argv']));
+		print call_user_func("ss_light_level", $_SERVER['argv']);
 	}
 	
 	function ss_light_level($room) {
