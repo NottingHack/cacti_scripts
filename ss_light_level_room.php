@@ -14,10 +14,12 @@
 	if (!isset($called_by_script_server)) {
 		include_once(dirname(__FILE__) . "/../include/global.php");
 		
-		print call_user_func("ss_temperature");
+		array_shift($_SERVER['argv']);
+
+		print call_user_func("ss_light_level", $_SERVER['argv']));
 	}
 	
-	function ss_temperature() {
+	function ss_light_level($room) {
 //		$db_host = "localhost";
 //		$db_user = "gk";
 //		$db_pass = "gk";
@@ -26,13 +28,13 @@
 
 //		$idb = new mysqli($db_host, $db_user, $db_pass, $db_db);
 		$idb = db_link();
-		$query = "SELECT name, temperature FROM temperature WHERE name IS NOT NULL ";
+		$query = "SELECT name, reading FROM light_level WHERE name = ".$room;
 
 		$result = $idb->query($query);
 		$output = "";
 
 		while ($row = $result->fetch_object())
-			$output .= $row->name.':'.$row->temperature.' ';
+			$output .= 'light_level:'.$row->reading.' ';
 
 		return $output;
 	}
