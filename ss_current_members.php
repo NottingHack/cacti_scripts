@@ -13,19 +13,19 @@ error_reporting(0);
 
 if (!isset($called_by_script_server)) {
     include_once(dirname(__FILE__) . "/../include/global.php");
-    
-    print call_user_func("ss_current_members");
+    array_shift($_SERVER['argv']);
+    print call_user_func_array("ss_current_members", $_SERVER['argv']);
 }
 
-function ss_current_members() {
+function ss_current_members($status) {
     $idb = db_link();
-    $query = "SELECT count(member_id) AS currentmembers FROM members WHERE member_status = 5";
+    $query = "SELECT count(member_id) AS members FROM members WHERE member_status = $status";
 
     $result = $idb->query($query);
     $output = "";
 
     while ($row = $result->fetch_object())
-        $output .= 'CurrentMembers:'.$row->currentmembers;
+        $output .= 'members:'.$row->members;
 
     return $output;
 }
