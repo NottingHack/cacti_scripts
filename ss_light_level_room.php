@@ -28,7 +28,7 @@ function ss_light_level($room) {
 
 	while ($row = $result->fetch_object()) {
         if ($row->name == $room) {
-		    return 'light_level:'.$row->reading;
+		    return 'LightLevel:'.$row->reading;
         }
     }
 
