@@ -9,7 +9,7 @@ if (!isset($_SERVER["argv"][0]) || isset($_SERVER['REQUEST_METHOD'])  || isset($
 $no_http_headers = true;
 
 /* display ALL errors */
-error_reporting(0);
+//error_reporting(0);
 
 if (!isset($called_by_script_server)) {
     include_once(dirname(__FILE__) . "/../include/global.php");
@@ -23,7 +23,7 @@ function ss_unifi_get_sta($host, $user, $pass, $info, $site)
 {
     //force to lowercase and change : to -
     $info = strtolower(str_replace(":", "-", $info));
-
+    
     $baseurl = 'https://'.$host.':8443';
 
     //get the data
@@ -106,13 +106,15 @@ function ss_unifi_get_sta($host, $user, $pass, $info, $site)
     foreach ($SSIDcount as $key => $value) {
         if ($info == strtolower($key)) {
             $myrssi = round(array_sum(${$key})/count(${$key}), 2);
-            print "connections:$value rssi:$myrssi";
+            $results = "connections:$value rssi:$myrssi";
         }
     }
     foreach ($APcount as $key => $value) {
         if ($info == $key) {
             $myrssi = round(array_sum(${$key})/count(${$key}),2);
-            print "connections:$value rssi:$myrssi";
+            $results = "connections:$value rssi:$myrssi";
         }
     }
+
+    return $results;
 }
