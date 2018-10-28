@@ -15,15 +15,16 @@ if (!isset($called_by_script_server)) {
     include_once(dirname(__FILE__) . "/../include/global.php");
     
     array_shift($_SERVER['argv']);
-
-    print call_user_func("ss_unifi_get_sta", $_SERVER['argv']);
+    
+    print call_user_func_array("ss_unifi_get_sta", $_SERVER['argv']);
 }
 
 function ss_unifi_get_sta($host, $user, $pass, $info, $site)
 {
     //force to lowercase and change : to -
     $info = strtolower(str_replace(":", "-", $info));
-    
+
+   
     $baseurl = 'https://'.$host.':8443';
 
     //get the data
@@ -66,10 +67,10 @@ function ss_unifi_get_sta($host, $user, $pass, $info, $site)
     $output = curl_exec($ch);
     curl_close($ch);
 
-    //echo $output;
+    // var_dump($output);
 
     $json_a = json_decode($output,true);
-
+    
     foreach($json_a['data'] as $data) {
 
         //for debug, will list all the output
@@ -102,6 +103,8 @@ function ss_unifi_get_sta($host, $user, $pass, $info, $site)
 
     $SSIDcount = array_count_values($mySSIDArray); //count up the number of times it shows up
     $APcount = array_count_values($myAPArray); //count up the number of times it shows up
+
+    $results = "connections:0 rssi:0";
 
     foreach ($SSIDcount as $key => $value) {
         if ($info == strtolower($key)) {
