@@ -1,5 +1,5 @@
 <?php
-require "/home/cacti/www_secure/db.php";
+require_once "/home/cacti/www_secure/db.php";
 
 /* do NOT run this script through a web browser */
 if (!isset($_SERVER["argv"][0]) || isset($_SERVER['REQUEST_METHOD'])  || isset($_SERVER['REMOTE_ADDR'])) {
