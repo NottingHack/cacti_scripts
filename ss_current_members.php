@@ -19,7 +19,20 @@ if (!isset($called_by_script_server)) {
 
 function ss_current_members($status) {
     $idb = db_link();
-    $query = "SELECT count(member_id) AS members FROM members WHERE member_status = $status";
+    switch ($status) {
+        case 5:
+            $roles = "('member.current', 'member.young', 'member.temporarybanned')";
+            break;
+        
+        case 6:
+            $roles = "('member.ex', 'member.banned')";
+            break;
+        default:
+            return ;
+            break;
+    }
+    
+    $query = "SELECT count(user_id) AS members FROM FROM user u INNER JOIN role_user ru ON (ru.user_id = u.id) INNER JOIN roles r ON (r.id = ru.role_id) WHERE r.name IN $roles";
 
     $result = $idb->query($query);
     $output = "";
