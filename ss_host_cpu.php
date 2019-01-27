@@ -1,10 +1,6 @@
 <?php
 
 /* do NOT run this script through a web browser */
-if (!isset($_SERVER['argv'][0]) || isset($_SERVER['REQUEST_METHOD'])  || isset($_SERVER['REMOTE_ADDR'])) {
-	die('<br><strong>This script is only meant to run at the command line.</strong>');
-}
-
 global $config;
 
 $no_http_headers = true;
@@ -13,7 +9,7 @@ $no_http_headers = true;
 error_reporting(0);
 
 if (!isset($called_by_script_server)) {
-	include_once(dirname(__FILE__) . '/../include/global.php');
+	include_once(dirname(__FILE__) . '/../include/cli_check.php');
 	include_once(dirname(__FILE__) . '/../lib/snmp.php');
 
 	array_shift($_SERVER['argv']);
@@ -25,19 +21,19 @@ if (!isset($called_by_script_server)) {
 
 function ss_host_cpu($hostname, $host_id, $snmp_auth, $cmd, $arg1 = '', $arg2 = '') {
 	$snmp = explode(':', $snmp_auth);
-	$snmp_version 	= $snmp[0];
-	$snmp_port    	= $snmp[1];
-	$snmp_timeout 	= $snmp[2];
-	$ping_retries 	= $snmp[3];
-	$max_oids		= $snmp[4];
+	$snmp_version = $snmp[0];
+	$snmp_port    = $snmp[1];
+	$snmp_timeout = $snmp[2];
+	$ping_retries = $snmp[3];
+	$max_oids     = $snmp[4];
 
-	$snmp_auth_username   	= '';
-	$snmp_auth_password   	= '';
-	$snmp_auth_protocol  	= '';
-	$snmp_priv_passphrase 	= '';
-	$snmp_priv_protocol   	= '';
-	$snmp_context         	= '';
-	$snmp_community 		= '';
+	$snmp_auth_username   = '';
+	$snmp_auth_password   = '';
+	$snmp_auth_protocol   = '';
+	$snmp_priv_passphrase = '';
+	$snmp_priv_protocol   = '';
+	$snmp_context         = '';
+	$snmp_community       = '';
 
 	if ($snmp_version == 3) {
 		$snmp_auth_username   = $snmp[6];
@@ -76,10 +72,10 @@ function ss_host_cpu($hostname, $host_id, $snmp_auth, $cmd, $arg1 = '', $arg2 = 
 		if (is_array($value)) {
 			$arr_index = ss_host_cpu_get_indexes($hostname, $snmp_community, $snmp_version, $snmp_auth_username, $snmp_auth_password, $snmp_auth_protocol, $snmp_priv_passphrase, $snmp_priv_protocol, $snmp_context, $snmp_port, $snmp_timeout, $ping_retries, $max_oids);
 
-			return sizeof($arr_index);
+			return cacti_sizeof($arr_index);
 		} else {
 			$indexes = explode(',', $value);
-			return sizeof($indexes);
+			return cacti_sizeof($indexes);
 		}
 	} elseif ($cmd == 'query') {
 		$value = api_plugin_hook_function('hmib_get_cpu_indexes', array('host_id' => $host_id));
@@ -115,8 +111,6 @@ function ss_host_cpu($hostname, $host_id, $snmp_auth, $cmd, $arg1 = '', $arg2 = 
 			if (isset($arr_index[$index]) && isset($arr[$index])) {
 				return $arr[$index];
 			} else {
-				cacti_log('ERROR: Invalid Return Value in ss_host_cpu.php for get ' . $index . ' and host_id ' . $host_id, false);
-
 				return 'U';
 			}
 		} else {
@@ -138,8 +132,8 @@ function ss_host_cpu_get_cpu_usage($hostname, $snmp_community, $snmp_version, $s
 		}
 	}
 
-	if (sizeof($return_arr)) {
-		$return_arr[4000] = round($sum / sizeof($return_arr));
+	if (cacti_sizeof($return_arr)) {
+		$return_arr[4000] = round($sum / cacti_sizeof($return_arr));
 	} else {
 		$return_arr[4000] = 0;
 	}
@@ -151,13 +145,15 @@ function ss_host_cpu_get_indexes($hostname, $snmp_community, $snmp_version, $snm
 	$arr = ss_host_cpu_reindex(cacti_snmp_walk($hostname, $snmp_community, '.1.3.6.1.2.1.25.3.3.1.2', $snmp_version, $snmp_auth_username, $snmp_auth_password, $snmp_auth_protocol, $snmp_priv_passphrase, $snmp_priv_protocol, $snmp_context, $snmp_port, $snmp_timeout, $ping_retries, $max_oids, SNMP_POLLER));
 	$return_arr = array();
 
-	foreach($arr as $index => $value) {
-		if (is_numeric($value)) {
-			$return_arr[$index] = $index;
+	if (cacti_sizeof($arr)) {
+		foreach($arr as $index => $value) {
+			if (is_numeric($value)) {
+				$return_arr[$index] = $index;
+			}
 		}
-	}
 
-	$return_arr[4000] = 'Total';
+		$return_arr[4000] = 'Total';
+	}
 
 	return $return_arr;
 }

@@ -1,10 +1,6 @@
 <?php
 
 /* do NOT run this script through a web browser */
-if (!isset($_SERVER['argv'][0]) || isset($_SERVER['REQUEST_METHOD'])  || isset($_SERVER['REMOTE_ADDR'])) {
-	die('<br><strong>This script is only meant to run at the command line.</strong>');
-}
-
 $no_http_headers = true;
 
 if (isset($config)) {
@@ -12,7 +8,7 @@ if (isset($config)) {
 }
 
 if (!isset($called_by_script_server)) {
-	include_once(dirname(__FILE__) . '/../include/global.php');
+	include_once(dirname(__FILE__) . '/../include/cli_check.php');
 	include_once(dirname(__FILE__) . '/../lib/snmp.php');
 
 	array_shift($_SERVER['argv']);
@@ -58,40 +54,40 @@ function ss_net_snmp_disk_io($host_id_or_hostname) {
 	$indexes = array();
 	$host    = db_fetch_row_prepared('SELECT * FROM host WHERE id = ?', array($host_id));
 
-	$uptime  = cacti_snmp_get($host['hostname'], 
-		$host['snmp_community'], 
+	$uptime  = cacti_snmp_get($host['hostname'],
+		$host['snmp_community'],
 		'.1.3.6.1.2.1.1.3.0',
-		$host['snmp_version'], 
-		$host['snmp_username'], 
-		$host['snmp_password'], 
-		$host['snmp_auth_protocol'], 
-		$host['snmp_priv_passphrase'], 
-		$host['snmp_priv_protocol'], 
-		$host['snmp_context'], 
-		$host['snmp_port'], 
-		$host['snmp_timeout'], 
-		$host['ping_retries'], 
-		$host['max_oids'], 
+		$host['snmp_version'],
+		$host['snmp_username'],
+		$host['snmp_password'],
+		$host['snmp_auth_protocol'],
+		$host['snmp_priv_passphrase'],
+		$host['snmp_priv_protocol'],
+		$host['snmp_context'],
+		$host['snmp_port'],
+		$host['snmp_timeout'],
+		$host['ping_retries'],
+		$host['max_oids'],
 		SNMP_POLLER,
 		$host['snmp_engine_id']);
 
 	$current['uptime'] = $uptime;
 
-	$names  = cacti_snmp_walk($host['hostname'], 
-		$host['snmp_community'], 
+	$names  = cacti_snmp_walk($host['hostname'],
+		$host['snmp_community'],
 		'.1.3.6.1.4.1.2021.13.15.1.1.2',
-		$host['snmp_version'], 
-		$host['snmp_username'], 
-		$host['snmp_password'], 
-		$host['snmp_auth_protocol'], 
-		$host['snmp_priv_passphrase'], 
-		$host['snmp_priv_protocol'], 
-		$host['snmp_context'], 
-		$host['snmp_port'], 
-		$host['snmp_timeout'], 
-		$host['ping_retries'], 
-		$host['max_oids'], 
-		SNMP_POLLER, 
+		$host['snmp_version'],
+		$host['snmp_username'],
+		$host['snmp_password'],
+		$host['snmp_auth_protocol'],
+		$host['snmp_priv_passphrase'],
+		$host['snmp_priv_protocol'],
+		$host['snmp_context'],
+		$host['snmp_port'],
+		$host['snmp_timeout'],
+		$host['ping_retries'],
+		$host['max_oids'],
+		SNMP_POLLER,
 		$host['snmp_engine_id']);
 
 	foreach($names as $measure) {
@@ -101,33 +97,33 @@ function ss_net_snmp_disk_io($host_id_or_hostname) {
 			}
 
 			$parts = explode('.', $measure['oid']);
-			$indexes[$parts[sizeof($parts)-1]] = $parts[sizeof($parts)-1];
+			$indexes[$parts[cacti_sizeof($parts)-1]] = $parts[cacti_sizeof($parts)-1];
 		}
 	}
 
 	$reads = $writes = 0;
 
-	if (sizeof($indexes)) {
-		$iops = cacti_snmp_walk($host['hostname'], 
-			$host['snmp_community'], 
+	if (cacti_sizeof($indexes)) {
+		$iops = cacti_snmp_walk($host['hostname'],
+			$host['snmp_community'],
 			'.1.3.6.1.4.1.2021.13.15.1.1.5',
-			$host['snmp_version'], 
-			$host['snmp_username'], 
-			$host['snmp_password'], 
-			$host['snmp_auth_protocol'], 
-			$host['snmp_priv_passphrase'], 
-			$host['snmp_priv_protocol'], 
-			$host['snmp_context'], 
-			$host['snmp_port'], 
-			$host['snmp_timeout'], 
-			$host['ping_retries'], 
-			$host['max_oids'], 
-			SNMP_POLLER, 
+			$host['snmp_version'],
+			$host['snmp_username'],
+			$host['snmp_password'],
+			$host['snmp_auth_protocol'],
+			$host['snmp_priv_passphrase'],
+			$host['snmp_priv_protocol'],
+			$host['snmp_context'],
+			$host['snmp_port'],
+			$host['snmp_timeout'],
+			$host['ping_retries'],
+			$host['max_oids'],
+			SNMP_POLLER,
 			$host['snmp_engine_id']);
 
 		foreach($iops as $measure) {
 			$parts = explode('.', $measure['oid']);
-			$index = $parts[sizeof($parts)-1];
+			$index = $parts[cacti_sizeof($parts)-1];
 
 			if (array_key_exists($index, $indexes)) {
 				if (!isset($previous['uptime'])) {
@@ -146,26 +142,26 @@ function ss_net_snmp_disk_io($host_id_or_hostname) {
 			}
 		}
 
-		$iops = cacti_snmp_walk($host['hostname'], 
-			$host['snmp_community'], 
+		$iops = cacti_snmp_walk($host['hostname'],
+			$host['snmp_community'],
 			'.1.3.6.1.4.1.2021.13.15.1.1.6',
-			$host['snmp_version'], 
-			$host['snmp_username'], 
-			$host['snmp_password'], 
-			$host['snmp_auth_protocol'], 
-			$host['snmp_priv_passphrase'], 
-			$host['snmp_priv_protocol'], 
-			$host['snmp_context'], 
-			$host['snmp_port'], 
-			$host['snmp_timeout'], 
-			$host['ping_retries'], 
-			$host['max_oids'], 
-			SNMP_POLLER, 
+			$host['snmp_version'],
+			$host['snmp_username'],
+			$host['snmp_password'],
+			$host['snmp_auth_protocol'],
+			$host['snmp_priv_passphrase'],
+			$host['snmp_priv_protocol'],
+			$host['snmp_context'],
+			$host['snmp_port'],
+			$host['snmp_timeout'],
+			$host['ping_retries'],
+			$host['max_oids'],
+			SNMP_POLLER,
 			$host['snmp_engine_id']);
 
 		foreach($iops as $measure) {
 			$parts = explode('.', $measure['oid']);
-			$index = $parts[sizeof($parts)-1];
+			$index = $parts[cacti_sizeof($parts)-1];
 
 			if (array_key_exists($index, $indexes)) {
 				if (!isset($previous['uptime'])) {
@@ -194,3 +190,4 @@ function ss_net_snmp_disk_io($host_id_or_hostname) {
 		return 'reads:0 writes:0';
 	}
 }
+
