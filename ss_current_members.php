@@ -23,7 +23,7 @@ function ss_current_members($status) {
         case 5:
             $roles = "('member.current', 'member.young', 'member.temporarybanned')";
             break;
-        
+
         case 6:
             $roles = "('member.ex', 'member.banned')";
             break;
@@ -31,8 +31,8 @@ function ss_current_members($status) {
             return ;
             break;
     }
-    
-    $query = "SELECT count(user_id) AS members FROM FROM user u INNER JOIN role_user ru ON (ru.user_id = u.id) INNER JOIN roles r ON (r.id = ru.role_id) WHERE r.name IN $roles";
+
+    $query = "SELECT count(user_id) AS members FROM user u INNER JOIN role_user ru ON (ru.user_id = u.id) INNER JOIN roles r ON (r.id = ru.role_id) WHERE r.name IN $roles";
 
     $result = $idb->query($query);
     $output = "";
