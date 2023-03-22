@@ -21,7 +21,7 @@ if (!isset($called_by_script_server)) {
 
 function ss_temperature($room) {
     $idb = db_link();
-    $query = "SELECT name, temperature FROM temperature WHERE name IS NOT NULL ";
+    $query = "SELECT t.name as name, t.temperature as temperature FROM temperature t WHERE name IS NOT NULL and timestampdiff(minute, t.time, UTC_TIMESTAMP()) < 20";
 
     $result = $idb->query($query);
     $output = "";

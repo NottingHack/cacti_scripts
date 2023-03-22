@@ -1,11 +1,28 @@
+#!/usr/bin/env php
 <?php
+/*
+ +-------------------------------------------------------------------------+
+ | Copyright (C) 2004-2022 The Cacti Group                                 |
+ |                                                                         |
+ | This program is free software; you can redistribute it and/or           |
+ | modify it under the terms of the GNU General Public License             |
+ | as published by the Free Software Foundation; either version 2          |
+ | of the License, or (at your option) any later version.                  |
+ |                                                                         |
+ | This program is distributed in the hope that it will be useful,         |
+ | but WITHOUT ANY WARRANTY; without even the implied warranty of          |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           |
+ | GNU General Public License for more details.                            |
+ +-------------------------------------------------------------------------+
+ | Cacti: The Complete RRDtool-based Graphing Solution                     |
+ +-------------------------------------------------------------------------+
+ | This code is designed, written, and maintained by the Cacti Group. See  |
+ | about.php and/or the AUTHORS file for specific developer information.   |
+ +-------------------------------------------------------------------------+
+ | http://www.cacti.net/                                                   |
+ +-------------------------------------------------------------------------+
+*/
 
-/* do NOT run this script through a web browser */
-global $config;
-
-$no_http_headers = true;
-
-/* display No errors */
 error_reporting(0);
 
 if (!isset($called_by_script_server)) {
@@ -15,11 +32,11 @@ if (!isset($called_by_script_server)) {
 	array_shift($_SERVER['argv']);
 
 	print call_user_func_array('ss_host_cpu', $_SERVER['argv']);
-}else{
-	include_once($config['library_path'] . '/snmp.php');
+} else {
+	include_once(dirname(__FILE__) . '/../lib/snmp.php');
 }
 
-function ss_host_cpu($hostname, $host_id, $snmp_auth, $cmd, $arg1 = '', $arg2 = '') {
+function ss_host_cpu($hostname = '', $host_id = 0, $snmp_auth = '', $cmd = 'index', $arg1 = '', $arg2 = '') {
 	$snmp = explode(':', $snmp_auth);
 	$snmp_version = $snmp[0];
 	$snmp_port    = $snmp[1];
@@ -57,8 +74,10 @@ function ss_host_cpu($hostname, $host_id, $snmp_auth, $cmd, $arg1 = '', $arg2 = 
 		if (is_array($value)) {
 			$arr_index = ss_host_cpu_get_indexes($hostname, $snmp_community, $snmp_version, $snmp_auth_username, $snmp_auth_password, $snmp_auth_protocol, $snmp_priv_passphrase, $snmp_priv_protocol, $snmp_context, $snmp_port, $snmp_timeout, $ping_retries, $max_oids);
 
-			foreach($arr_index as $value) {
-				print $value . "\n";
+			if (cacti_sizeof($arr_index)) {
+				foreach($arr_index as $value) {
+					print $value . "\n";
+				}
 			}
 		} else {
 			$indexes = explode(',', $value);
@@ -86,11 +105,13 @@ function ss_host_cpu($hostname, $host_id, $snmp_auth, $cmd, $arg1 = '', $arg2 = 
 			$arr_index = ss_host_cpu_get_indexes($hostname, $snmp_community, $snmp_version, $snmp_auth_username, $snmp_auth_password, $snmp_auth_protocol, $snmp_priv_passphrase, $snmp_priv_protocol, $snmp_context, $snmp_port, $snmp_timeout, $ping_retries, $max_oids);
 			$arr = ss_host_cpu_get_cpu_usage($hostname, $snmp_community, $snmp_version, $snmp_auth_username, $snmp_auth_password, $snmp_auth_protocol, $snmp_priv_passphrase, $snmp_priv_protocol, $snmp_context, $snmp_port, $snmp_timeout, $ping_retries, $max_oids);
 
-			foreach ($arr_index as $index => $value) {
-				if ($arg == 'usage') {
-					print $index . '!' . $arr[$index] . "\n";
-				} elseif ($arg == 'index') {
-					print $index . '!' . $value . "\n";
+			if (cacti_sizeof($arr_index)) {
+				foreach ($arr_index as $index => $value) {
+					if ($arg == 'usage') {
+						print $index . '!' . $arr[$index] . "\n";
+					} elseif ($arg == 'index') {
+						print $index . '!' . $value . "\n";
+					}
 				}
 			}
 		} else {
@@ -125,20 +146,24 @@ function ss_host_cpu_get_cpu_usage($hostname, $snmp_community, $snmp_version, $s
 
 	$sum = 0;
 
-	foreach($arr as $index => $value) {
-		if (is_numeric($value)) {
-			$return_arr[$index] = $value;
-			$sum += $value;
+	if (cacti_sizeof($arr)) {
+		foreach($arr as $index => $value) {
+			if (is_numeric($value)) {
+				$return_arr[$index] = $value;
+				$sum += $value;
+			}
 		}
-	}
 
-	if (cacti_sizeof($return_arr)) {
-		$return_arr[4000] = round($sum / cacti_sizeof($return_arr));
+		if (cacti_sizeof($return_arr)) {
+			$return_arr[4000] = round($sum / cacti_sizeof($return_arr));
+		} else {
+			$return_arr[4000] = 0;
+		}
+
+		return $return_arr;
 	} else {
-		$return_arr[4000] = 0;
+		return array();
 	}
-
-	return $return_arr;
 }
 
 function ss_host_cpu_get_indexes($hostname, $snmp_community, $snmp_version, $snmp_auth_username, $snmp_auth_password, $snmp_auth_protocol, $snmp_priv_passphrase, $snmp_priv_protocol, $snmp_context, $snmp_port, $snmp_timeout, $ping_retries, $max_oids) {
@@ -161,10 +186,11 @@ function ss_host_cpu_get_indexes($hostname, $snmp_community, $snmp_version, $snm
 function ss_host_cpu_reindex($arr) {
 	$return_arr = array();
 
-	foreach($arr as $index => $value) {
-		$return_arr[$index] = $value['value'];
+	if (cacti_sizeof($arr)) {
+		foreach($arr as $index => $value) {
+			$return_arr[$index] = $value['value'];
+		}
 	}
 
 	return $return_arr;
 }
-
